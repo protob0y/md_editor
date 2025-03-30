@@ -9,17 +9,28 @@
 #ifndef DIALOG_H
 #define DIALOG_H
 
+enum DialogStatus{
+    OPEN,
+    SAVE,
+    ABORT
+};
+
 class Dialog{
     public:
     Dialog(SDL_Renderer * rinstance, Font * finstance);
     void RenderDialog();
-    // TODO RegisterKeypress: The wordproc is currently receiving keypresses.
-    // if the dialog is active, is should forward the keypress to it.
+    void RegisterKeypress(SDL_Event * event);
+    void RegisterTextInput(std::string letter);
+    void setDialogStatus(DialogStatus ds);
+    DialogStatus getDialogStatus();
+    std::string getFilePath();
+    DialogStatus ds = OPEN;
 
     private:
     SDL_Renderer * renderer = NULL;
     Font * dialog_font = NULL;
     void WriteCentered(std::wstring text, int posy);
+    std::string filename = "filename";
 };
 
 

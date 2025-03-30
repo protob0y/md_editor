@@ -35,10 +35,30 @@ void WordProc::RenderScreen(){
     
     if(showSaveDialog){
         saveDialog->RenderDialog();
+        // Handle dialog events
+        const DialogStatus ds = saveDialog->ds;
+        switch(ds){
+            case ABORT:
+            showSaveDialog = false;
+            break;
+            case SAVE:
+            std::cout << "Saving file to " << std::endl;
+            std::cout << saveDialog->getFilePath() << std::endl;
+            showSaveDialog = false;
+            break;
+            default:
+            break;
+        }
     }
 }
 
 void WordProc::RegisterTextinput(const char * utf8Text){
+    if(showSaveDialog){
+        const std::string letter(utf8Text); // since dialog needs wstring anyways, maybe well keep the conversion?
+        saveDialog->RegisterTextInput(letter);
+        return;
+    }
+
     std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
     std::wstring wletter = converter.from_bytes(utf8Text);
     document[cursor_line].insert(cursor_col, wletter);
@@ -48,6 +68,10 @@ void WordProc::RegisterTextinput(const char * utf8Text){
 }
 
 void WordProc::RegisterKeypress(SDL_Event * event){
+    if(showSaveDialog){
+        saveDialog->RegisterKeypress(event);
+        return; // if dialog is shown, dont evaluate keypress here.
+    }
     switch(event->key.keysym.sym){
         case SDLK_RETURN: {
             if(cursor_col != document[cursor_line].size()){ // if cursor not at EOL
@@ -134,6 +158,7 @@ void WordProc::RegisterKeypress(SDL_Event * event){
         }
         case SDLK_ESCAPE:
             showSaveDialog = true;
+            saveDialog->ds = OPEN;
             break;
     }
     

@@ -40,7 +40,8 @@ void Dialog::RenderDialog(){
 
 
     //Draw Text
-    WriteCentered(L"Do you want to save?", 200);
+    WriteCentered(L"Enter filename to save:", 200);
+    WriteCentered(L"Or press ESC to return", 260);
     
 }
 
@@ -54,4 +55,23 @@ void Dialog::WriteCentered(std::wstring text, int posy){
         dialog_font->renderChar(renderer, c, posx, posy);
         posx += glyphWidth;
     }
+}
+
+void Dialog::RegisterKeypress(SDL_Event * event){
+    switch(event->key.keysym.sym){
+        case SDLK_ESCAPE:
+        ds = ABORT;
+        break;
+        case SDLK_RETURN:
+        ds = SAVE;
+        break;
+    }
+}
+
+void Dialog::RegisterTextInput(std::string letter){
+    filename.append(letter);
+}
+
+std::string Dialog::getFilePath(){
+    return "filepath";
 }
