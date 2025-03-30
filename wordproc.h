@@ -10,6 +10,7 @@
 #include "font.h"
 #include <string>
 #include <vector>
+#include <fstream>
 #include "texturemanager.h"
 #include "dialog.h"
 

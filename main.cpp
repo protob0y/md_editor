@@ -17,7 +17,6 @@
 // main menu
 // --> implement loading files
 // auto changing wallpaper after a random amount of time which can be accelerated by typing
-// added comment!
 
 //bugfixes:
 
