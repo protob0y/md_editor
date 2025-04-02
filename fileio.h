@@ -10,7 +10,7 @@
 
 class FileIO{
     public:
-    bool SaveFile(std::vector<std::wstring> * pDocument);
+    bool SaveFile(std::vector<std::wstring> * pDocument, std::string filename);
 
 
 
