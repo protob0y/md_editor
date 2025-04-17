@@ -13,6 +13,7 @@
 #include <fstream>
 #include "texturemanager.h"
 #include "dialog.h"
+#include "fileio.h"
 
 #include <locale> // for conversion of const char * (SDL Text input) to Uint16 letter for wstring
 #include <codecvt>

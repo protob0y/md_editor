@@ -33,19 +33,21 @@ void WordProc::RenderScreen(){
         DrawCursor();
     }
     
+    // Handle dialog events
     if(showSaveDialog){
         saveDialog->RenderDialog();
-        // Handle dialog events
         const DialogStatus ds = saveDialog->ds;
         switch(ds){
             case ABORT:
             showSaveDialog = false;
             break;
-            case SAVE:
-            std::cout << "Saving file to " << std::endl;
-            std::cout << saveDialog->getFilePath() << std::endl;
+            case SAVE:{
+            std::string saveFilePath = saveDialog->getFilePath();
+            std::cout << "Saving file to " << saveFilePath << std::endl;
             showSaveDialog = false;
-            break;
+            FileIO fileio;
+            fileio.SaveFile(&document, saveFilePath);
+            break;}
             default:
             break;
         }
@@ -53,14 +55,14 @@ void WordProc::RenderScreen(){
 }
 
 void WordProc::RegisterTextinput(const char * utf8Text){
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter; // conversion to wstring
+    std::wstring wletter = converter.from_bytes(utf8Text);
+    
     if(showSaveDialog){
-        const std::string letter(utf8Text); // since dialog needs wstring anyways, maybe well keep the conversion?
-        saveDialog->RegisterTextInput(letter);
-        return;
+        saveDialog->RegisterTextInput(wletter);
+        return; // if dialog is shown, dont evaluate text input here.
     }
 
-    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-    std::wstring wletter = converter.from_bytes(utf8Text);
     document[cursor_line].insert(cursor_col, wletter);
     cursor_col++;
 

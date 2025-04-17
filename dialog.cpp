@@ -41,6 +41,7 @@ void Dialog::RenderDialog(){
 
     //Draw Text
     WriteCentered(L"Enter filename to save:", 200);
+    WriteCentered(filename, 230);
     WriteCentered(L"Or press ESC to return", 260);
     
 }
@@ -63,15 +64,23 @@ void Dialog::RegisterKeypress(SDL_Event * event){
         ds = ABORT;
         break;
         case SDLK_RETURN:
-        ds = SAVE;
+        if(filename.size() > 0){
+            ds = SAVE;
+        }
+        break;
+        case SDLK_BACKSPACE:
+        if(filename.size() > 0){
+            filename.erase(filename.size() - 1);
+        }
         break;
     }
 }
 
-void Dialog::RegisterTextInput(std::string letter){
+void Dialog::RegisterTextInput(std::wstring letter){
     filename.append(letter);
 }
 
 std::string Dialog::getFilePath(){
-    return "filepath";
+    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter; // convert to std::string
+    return converter.to_bytes(filename);
 }
