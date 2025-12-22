@@ -5,21 +5,44 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
-#include "state.h"
 #include "font.h"
 #include "texturemanager.h"
 #include <string>
 #include <map>
 #include <vector>
 
-enum menu_state{MAIN, START, LOAD, SETTINGS, EXIT};
+enum class AppCommand{ // command to be sent back to main
+    None,
+    StartGame,
+    ToggleMusic,
+    ToggleSound,
+    ToggleFullscreen,
+    VolumeUp,
+    VolumeDown,
+    LoadGame,
+    QuitGame
+};
+
+struct MenuLayer; // defined later
+
+struct MenuItem{
+    std::wstring label;
+    AppCommand cmd = AppCommand::None;
+    MenuLayer * child = nullptr; // points to sub menu
+};
+
+struct MenuLayer{
+    std::wstring title; // title of this menu
+    std::vector<MenuItem> entries;
+};
 
 class menu{
     public:
     menu(SDL_Renderer * rinstance, Font * finstance, TextureManager * tminstance);
     ~menu();
     void RenderMenu();
-    state registerKeypress(SDL_Event * event);
+    void registerKeypress(SDL_Event * event);
+    AppCommand getPendingCommand();
     
     private:
     Mix_Music * music = NULL;
@@ -29,15 +52,19 @@ class menu{
     TextureManager * texMan = NULL;
 
     SDL_Texture * splash = NULL;
-    std::map<menu_state, std::vector<std::wstring>> menuItems = {
-        {MAIN, {L"Play", L"Settings", L"Exit"}},
-        {START, {L"New Game", L"Load", L"Back"}},
-        {LOAD, {L"FILE#1", L"Back"}},
-        {EXIT, {L"Yes", L"No"}},
-        {SETTINGS, {L"Fullscreen", L"Back"}}
-    };
-    menu_state mState = MAIN;
+
+    AppCommand pendingCmd = AppCommand::None;
+
+    MenuLayer rootMenu;
+    MenuLayer settingsMenu;
+    MenuLayer exitMenu;
+
+    std::vector<MenuLayer*> menuStack; // last element indicates current sub menu
+
     int cursorpos = 0;
+    
+    void buildMenu();
+    void buildLoadGameMenu();
 
     void WriteCentered(std::wstring text, int posy);
 };

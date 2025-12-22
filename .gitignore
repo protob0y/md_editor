@@ -6,3 +6,6 @@
 *.dSYM
 *.wav
 *.ogg
+.DS_Store
+Retrowriter.code-workspace
+main

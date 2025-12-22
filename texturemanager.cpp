@@ -17,6 +17,7 @@ SDL_Texture * TextureManager::LoadTexture(const std::string& filePath){
         return textureCache[filePath]; // then return the corresponding texture
     }
 
+    // otherwise, if this file hasn't been loaded before
     SDL_Surface * tempSurface = IMG_Load(filePath.c_str());
     if(!tempSurface){
         std::cout << "Error loading " << filePath << ": " << IMG_GetError() << std::endl;

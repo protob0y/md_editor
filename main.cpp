@@ -19,6 +19,8 @@
 // auto changing wallpaper after a random amount of time which can be accelerated by typing
 
 //bugfixes:
+// music and sound shouldn't be outsourced to menu class
+// menu needs tree structure using it's MenuItem
 
 using namespace std;
 
@@ -92,7 +94,7 @@ int main(){
     SDL_Event event;
     SDL_StartTextInput();
 
-    //Timing
+    //Frame Timing
     const int FPS = 60;
     const int frameDelay = 1000 / FPS; // how long we want to keep one frame on screen
     Uint32 frameStart;
@@ -108,9 +110,20 @@ int main(){
             }
             else if(event.type == SDL_KEYDOWN){
                 switch(current_state){
-                    case MENU:
-                    current_state = main_menu.registerKeypress(&event);
-                    break;
+                    case MENU:{
+                    main_menu.registerKeypress(&event);
+                    AppCommand pendingCmd = main_menu.getPendingCommand();
+                    switch(pendingCmd){
+                        case AppCommand::StartGame:
+                        current_state = EDITOR;
+                        break;
+                        case AppCommand::QuitGame:
+                        running = false;
+                        break;
+                        default:
+                        break;
+                    }
+                    break;}
                     
                     case EDITOR:
                     wordprocessor.RegisterKeypress(&event);

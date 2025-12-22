@@ -22,6 +22,7 @@ class TextureManager{
 
     private:
     SDL_Renderer * renderer;
+    // textureCache stores filename along SDL_Texture
     std::map<std::string, SDL_Texture*> textureCache; 
 };
 
