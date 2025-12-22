@@ -17,13 +17,14 @@ Font::Font(SDL_Renderer * renderer,  const std::string& fontPath, int fontSize){
         return;
     }
 
-    std::wstring chars = L"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890ÄÖÜäöüß.,:!? +-*/()#^<>"; // later all these will be rendered to the atlas
+    std::u32string chars = U"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    U"1234567890ÄÖÜäöüß.,:!? +-*/()#^<>"; // later all these will be rendered to the atlas
 
     // atlasTexture will later be rendered from atlasSurface
     atlasSurface = SDL_CreateRGBSurfaceWithFormat(0, atlasSizeX, atlasSizeY, 32, SDL_PIXELFORMAT_RGBA8888);
     SDL_FillRect(atlasSurface, NULL, SDL_MapRGBA(atlasSurface->format, 0, 0, 0, 0)); // transparency
 
-    for(Uint16 c : chars){
+    for(char32_t c : chars){
         AddGlyphToSurface(c);
     }
 
@@ -46,14 +47,16 @@ void Font::setColor(int r, int g, int b){
 }
 
 void Font::renderTable(SDL_Renderer * renderer, int x, int y){
+    //Blits texture atlas to screen
     SDL_Rect srcRect = {0, 0, 512, 512};
     SDL_Rect dstRect = {x, y, srcRect.w, srcRect.h};
     SDL_RenderCopy(renderer, textureAtlas, &srcRect, &dstRect);
 }
 
-void Font::renderChar(SDL_Renderer * renderer, Uint16 letter, int x, int y){
+void Font::renderChar(SDL_Renderer * renderer, char32_t letter, int x, int y){
+    //Blits given character to given position on screen
     if(glyphRects.find(letter) == glyphRects.end()){
-        std::cout << "Trying to render requested letter " << letter << ". This shouldnt happen too often." << std::endl;
+        std::cout << "Trying to render a newly requested letter. This shouldnt happen too often." << std::endl;
         AddGlyphToSurface(letter);
         textureAtlas = SDL_CreateTextureFromSurface(renderer, atlasSurface);
         return;
@@ -62,7 +65,6 @@ void Font::renderChar(SDL_Renderer * renderer, Uint16 letter, int x, int y){
     SDL_Rect srcRect = glyphRects[letter];
     SDL_Rect dstRect = {x, y, srcRect.w, srcRect.h};
     SDL_RenderCopy(renderer, textureAtlas, &srcRect, &dstRect);
-
 }
 
 int Font::getGlyphWidth(){
@@ -73,10 +75,10 @@ int Font::getGlyphHeight(){
     return glyphRects.begin()->second.h;
 }
 
-void Font::AddGlyphToSurface(Uint16 c){ // adds a glyph to the atlas Surface, does upate texture!
-    SDL_Surface *glyphSurface = TTF_RenderGlyph_Blended(ttfFont, (Uint16)c, {255, 255, 255, 255});
+void Font::AddGlyphToSurface(char32_t c){ // adds a glyph to the atlas Surface, does upate texture!
+    SDL_Surface *glyphSurface = TTF_RenderGlyph32_Blended(ttfFont, c, {255, 255, 255, 255});
     if(!glyphSurface){
-        std::cout << "Error rendering glyph " << c << std::endl;
+        std::cout << "Error rendering a glyph." << std::endl;
         return;
     }
     //check if we need a new line for this glyph
@@ -88,7 +90,7 @@ void Font::AddGlyphToSurface(Uint16 c){ // adds a glyph to the atlas Surface, do
     SDL_BlitSurface(glyphSurface, NULL, atlasSurface, &destRect); // copy glyph to atlas surface
 
     // save position in map
-    glyphRects[(Uint16)c] = destRect;
+    glyphRects[c] = destRect;
 
     draw_x += glyphSurface->w;
 

@@ -15,8 +15,7 @@
 #include "dialog.h"
 #include "fileio.h"
 
-#include <locale> // for conversion of const char * (SDL Text input) to Uint16 letter for wstring
-#include <codecvt>
+#include "utf8.h"
 
 class WordProc{
     public:
@@ -35,7 +34,7 @@ class WordProc{
 
     SDL_Texture * background = NULL;
 
-    std::vector<std::wstring> document;
+    std::vector<std::u32string> document;
 
     int cursor_line = 0; // is zero in first line of document
     int cursor_col = 0; // cursor col counts behind last glyph (i.e. "Hi|" <-- cursor_col = 2)

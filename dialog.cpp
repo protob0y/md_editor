@@ -81,6 +81,5 @@ void Dialog::RegisterTextInput(std::wstring letter){
 }
 
 std::string Dialog::getFilePath(){
-    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter; // convert to std::string
-    return converter.to_bytes(filename);
+    return "not_implemented_yet";
 }

@@ -15,19 +15,19 @@ public:
 
     void setColor(int r, int g, int b);
     void renderTable(SDL_Renderer * renderer, int x, int y);
-    void renderChar(SDL_Renderer * renderer, Uint16 letter, int x, int y);
+    void renderChar(SDL_Renderer * renderer, char32_t letter, int x, int y);
     int getGlyphWidth();
     int getGlyphHeight();
 private:
     TTF_Font* ttfFont = NULL;
     int atlasSizeX = 512, atlasSizeY = 512;
-    std::map<Uint16, SDL_Rect> glyphRects; // map is something like a dictionary in python
+    std::map<char32_t, SDL_Rect> glyphRects; // map is something like a dictionary in python
     SDL_Surface * atlasSurface = NULL;
     SDL_Texture * textureAtlas = NULL;
     int draw_x = 0; // position where new glyphs will be added
     int draw_y = 0;
 
-    void AddGlyphToSurface(Uint16 c);
+    void AddGlyphToSurface(char32_t c);
 };
 
 

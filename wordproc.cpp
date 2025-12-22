@@ -8,7 +8,7 @@ WordProc::WordProc(SDL_Renderer * rinstance, Font * finstance, TextureManager * 
 
     background = texMan->LoadTexture("resources/snow.png");
 
-    std::wstring line = L"Write here...";
+    std::u32string line = U"Write here...";
     cursor_col = line.size();
     document.push_back(line);
 
@@ -21,7 +21,7 @@ void WordProc::RenderScreen(){
     int posx = margin_left;
     int posy = margin_top;
     for(int line = 0; line < document.size(); line++){
-        for(Uint16 c : document[line]){
+        for(char32_t c : document[line]){
             smallfont->renderChar(renderer, c, posx, posy);
             posx += smallfont->getGlyphWidth();
         }
@@ -46,7 +46,7 @@ void WordProc::RenderScreen(){
             std::cout << "Saving file to " << saveFilePath << std::endl;
             showSaveDialog = false;
             FileIO fileio;
-            fileio.SaveFile(&document, saveFilePath);
+            //fileio.SaveFile(&document, saveFilePath); // removed because of utf32 switch WIP
             break;}
             default:
             break;
@@ -54,17 +54,17 @@ void WordProc::RenderScreen(){
     }
 }
 
-void WordProc::RegisterTextinput(const char * utf8Text){
-    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter; // conversion to wstring
-    std::wstring wletter = converter.from_bytes(utf8Text);
-    
-    if(showSaveDialog){
+void WordProc::RegisterTextinput(const char * utf8Text){    
+    /*if(showSaveDialog){
         saveDialog->RegisterTextInput(wletter);
         return; // if dialog is shown, dont evaluate text input here.
-    }
+    }*/
 
-    document[cursor_line].insert(cursor_col, wletter);
-    cursor_col++;
+    std::u32string tmp;
+    utf8::utf8to32(utf8Text, utf8Text + std::strlen(utf8Text), std::back_inserter(tmp));
+    
+    document[cursor_line].insert(cursor_col, tmp);
+    cursor_col += tmp.size();
 
     cursorBlinkShowing = true;
 }
@@ -77,7 +77,7 @@ void WordProc::RegisterKeypress(SDL_Event * event){
     switch(event->key.keysym.sym){
         case SDLK_RETURN: {
             if(cursor_col != document[cursor_line].size()){ // if cursor not at EOL
-                std::wstring right = document[cursor_line].substr(cursor_col);  // cut right part and move to next line
+                std::u32string right = document[cursor_line].substr(cursor_col);  // cut right part and move to next line
                 document[cursor_line] = document[cursor_line].substr(0, cursor_col);
                 document.insert(document.begin() + cursor_line + 1, right);
                 cursor_line++;
@@ -85,14 +85,14 @@ void WordProc::RegisterKeypress(SDL_Event * event){
                 break;
             }
 
-            //this only happens if cursor was at EOL
+            //this only happens if cursor is at EOL
             if((cursor_line + 1) == document.size()){ // if cursor in last line of document
-                document.push_back(L"");
+                document.push_back(U"");
                 cursor_line++;
                 cursor_col = 0;
             }
             else{
-                document.insert(document.begin() + cursor_line + 1, L"");
+                document.insert(document.begin() + cursor_line + 1, U"");
                 cursor_line++;
                 cursor_col = 0;
             }
@@ -100,10 +100,10 @@ void WordProc::RegisterKeypress(SDL_Event * event){
             break;
         }
         case SDLK_BACKSPACE: {
-            if(cursor_col == 0)
+            if(cursor_col == 0) // if cursor at beginning of a line
             {
                 if(cursor_line != 0){
-                    std::wstring buffer = document[cursor_line];
+                    std::u32string buffer = document[cursor_line];
                     document.erase(document.begin() + cursor_line);
                     cursor_line--;
                     cursor_col = document[cursor_line].size();
