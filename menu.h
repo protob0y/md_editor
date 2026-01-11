@@ -4,9 +4,9 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_mixer.h>
 #include "font.h"
 #include "texturemanager.h"
+#include "audio.h"
 #include <string>
 #include <map>
 #include <vector>
@@ -38,18 +38,17 @@ struct MenuLayer{
 
 class menu{
     public:
-    menu(SDL_Renderer * rinstance, Font * finstance, TextureManager * tminstance);
+    menu(audio * ainstance, SDL_Renderer * rinstance, Font * finstance, TextureManager * tminstance);
     ~menu();
     void RenderMenu();
     void registerKeypress(SDL_Event * event);
     AppCommand getPendingCommand();
     
     private:
-    Mix_Music * music = NULL;
-    Mix_Chunk * sound_effect = NULL;
     SDL_Renderer * renderer = NULL;
     Font * menu_font = NULL;
     TextureManager * texMan = NULL;
+    audio * Audio = NULL;
 
     SDL_Texture * splash = NULL;
 

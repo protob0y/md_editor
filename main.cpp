@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include "wordproc.h"
+#include "audio.h"
 #include "font.h"
 #include "state.h"
 #include "menu.h"
@@ -17,6 +18,7 @@
 // main menu
 // --> implement loading files
 // auto changing wallpaper after a random amount of time which can be accelerated by typing
+// implement music player with file scanning
 
 //bugfixes:
 // music and sound shouldn't be outsourced to menu class
@@ -79,10 +81,11 @@ int main(){
 
     // instantiate fonts and wordprocessor
     TextureManager texManager(renderer);
+    audio Audio;
     Font small_font(renderer, "resources/PressStart.ttf", 18);
     Font menu_font(renderer, "resources/PressStart.ttf", 25);
     Font dialog_font(renderer, "resources/PressStart.ttf", 14);
-    menu main_menu(renderer, &menu_font, &texManager);
+    menu main_menu(&Audio, renderer, &menu_font, &texManager);
     Dialog saveDialog(renderer, &dialog_font);
     WordProc wordprocessor(renderer, &small_font, &texManager, &saveDialog);
 
@@ -99,6 +102,8 @@ int main(){
     const int frameDelay = 1000 / FPS; // how long we want to keep one frame on screen
     Uint32 frameStart;
     int frameTime; // how long it took to draw this frame
+
+    Audio.PlayMusic(MusicID::snowfall);
 
     while(running){
         while (SDL_PollEvent(&event)) {

@@ -1,6 +1,7 @@
 #include "menu.h"
 
-menu::menu(SDL_Renderer * rinstance, Font * finstance, TextureManager * tminstance){
+menu::menu(audio * ainstance, SDL_Renderer * rinstance, Font * finstance, TextureManager * tminstance){
+    Audio = ainstance;
     renderer = rinstance;
     texMan = tminstance;
     menu_font = finstance;
@@ -8,29 +9,11 @@ menu::menu(SDL_Renderer * rinstance, Font * finstance, TextureManager * tminstan
     splash = texMan->LoadTexture("resources/splash.png");
     //menu_font->setColor(13, 13, 150);
 
-    //Music
-    music = Mix_LoadMUS("resources/music/snow.opus");
-    if(music == NULL){
-        std::cout << "Error reading music file." << std::endl;
-    }
-    sound_effect = Mix_LoadWAV("resources/pluck.wav");
-    if(sound_effect == NULL){
-        std::cout << "Error reading music file." << std::endl;
-    }
-    if(Mix_PlayingMusic() == 0){
-        Mix_PlayMusic(music, -1);
-    }
-
     buildMenu(); // populate vector<MenuItem> rootMenu
 }
 
 menu::~menu(){
-    if(music != NULL){
-        Mix_FreeMusic(music);
-    }
-    if(sound_effect != NULL){
-        Mix_FreeChunk(sound_effect);
-    }
+
 }
 
 void menu::RenderMenu(){
@@ -73,20 +56,21 @@ void menu::registerKeypress(SDL_Event * event){
         break;}
 
         case SDLK_UP:
+        Audio->PlaySound(SoundID::Pluck);
         if(cursorpos > 0){
             cursorpos--;
-            Mix_PlayChannel(-1, sound_effect, 0);
         }
         break;
 
         case SDLK_DOWN:
+        Audio->PlaySound(SoundID::Pluck);
         if(cursorpos < (activeMenu->entries.size() - 1)){
             cursorpos++;
-            Mix_PlayChannel(-1, sound_effect, 0);
         }
         break;
 
         case SDLK_ESCAPE:
+        Audio->PlaySound(SoundID::Woosh);
         if(menuStack.size() > 1){ // if sub / sub sub menu is active
             menuStack.pop_back(); // go menu layer up
             cursorpos = 0;
